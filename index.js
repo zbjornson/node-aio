@@ -7,9 +7,13 @@ exports.readFile = function (path, cb) {
 	}
 	fs.open(path, "r", 0o666, (err, fd) => {
 		if (err) return cb(err);
+		const onerr = err => fs.close(fd, () => cb(err));
 		fs.fstat(fd, (err, stats) => {
-			if (err) return cb(err);
-			bindings.readFile(fd, stats.size, cb);
+			if (err) return onerr(err);
+			bindings.readFile(fd, stats.size, (err, data) => {
+				if (err) return onerr(err);
+				fs.close(fd, (err) => cb(err, data));
+			});
 		});
 	});
 };
