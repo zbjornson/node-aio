@@ -44,11 +44,15 @@ void AfterWork(uv_work_t* uvwork, int status) {
     Nan::HandleScope scope;
     v8::Local<v8::Value> argv[2] = { Nan::Null(), Nan::New(resource->output) };
     resource->callback.Call(2, argv, resource);
+    delete resource;
+    delete uvwork;
 
   } else {
     Nan::HandleScope scope;
     v8::Local<v8::Value> argv[1] = { Nan::ErrnoException(resource->status) };
     resource->callback.Call(1, argv, resource);
+    delete resource;
+    delete uvwork;
 
   }
 }
